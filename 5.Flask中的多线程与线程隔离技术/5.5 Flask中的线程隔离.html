@@ -1,0 +1,1411 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>5.3 Flask中的线程隔离 · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="5.6 梳理串接flask的一些名词.html" />
+    
+    
+    <link rel="prev" href="5.2 全局解释器锁GIL.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    介绍
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../1.项目准备与flask基础/">
+            
+                <a href="../1.项目准备与flask基础/">
+            
+                    
+                    1.项目准备与flask基础
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="../1.项目准备与flask基础/1.1pipenv 安装与使用.html">
+            
+                <a href="../1.项目准备与flask基础/1.1pipenv 安装与使用.html">
+            
+                    
+                    1.1 pipenv 安装与使用
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="../1.项目准备与flask基础/2.flask 入门基础.html">
+            
+                <a href="../1.项目准备与flask基础/2.flask 入门基础.html">
+            
+                    
+                    1.2 flask 入门基础
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="../2.搜索书籍路由编写/">
+            
+                <a href="../2.搜索书籍路由编写/">
+            
+                    
+                    2.数据与flask路由
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="../2.搜索书籍路由编写/2.1 定义参数，判断查询参数q是否是isbn号.html">
+            
+                <a href="../2.搜索书籍路由编写/2.1 定义参数，判断查询参数q是否是isbn号.html">
+            
+                    
+                    2.1 定义参数，判断查询参数q是否是isbn号
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="../2.搜索书籍路由编写/2.2 简单的重构.html">
+            
+                <a href="../2.搜索书籍路由编写/2.2 简单的重构.html">
+            
+                    
+                    2.2 简单的重构
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="../2.搜索书籍路由编写/2.3 requests发送http请求及代码的简化手段.html">
+            
+                <a href="../2.搜索书籍路由编写/2.3 requests发送http请求及代码的简化手段.html">
+            
+                    
+                    2.3 requests发送http请求及代码的简化手段
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="../2.搜索书籍路由编写/2.4 requests vs urllib.html">
+            
+                <a href="../2.搜索书籍路由编写/2.4 requests vs urllib.html">
+            
+                    
+                    2.4 requests vs urllib
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.5" data-path="../2.搜索书籍路由编写/2.5 从API获取数据.html">
+            
+                <a href="../2.搜索书籍路由编写/2.5 从API获取数据.html">
+            
+                    
+                    2.5 从API获取数据
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.6" data-path="../2.搜索书籍路由编写/2.6 将视图函数拆分到单独的模块中.html">
+            
+                <a href="../2.搜索书籍路由编写/2.6 将视图函数拆分到单独的模块中.html">
+            
+                    
+                    2.6 多模块拆分的误区
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="../3.蓝图、模型与CodeFirst/">
+            
+                <a href="../3.蓝图、模型与CodeFirst/">
+            
+                    
+                    3.蓝图、模型与CodeFirst
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.4.1" data-path="../3.蓝图、模型与CodeFirst/3.1 应用、蓝图与视图函数.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.1 应用、蓝图与视图函数.html">
+            
+                    
+                    3.1 应用、蓝图与视图函数
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="../3.蓝图、模型与CodeFirst/3.2 用蓝图注册试图函数.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.2 用蓝图注册试图函数.html">
+            
+                    
+                    3.2 用蓝图注册视图函数
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.3" data-path="../3.蓝图、模型与CodeFirst/3.3 单蓝图多模块拆分视图函数.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.3 单蓝图多模块拆分视图函数.html">
+            
+                    
+                    3.3 单蓝图多模块拆分视图函数
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.4" data-path="../3.蓝图、模型与CodeFirst/3.4 Request对象.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.4 Request对象.html">
+            
+                    
+                    3.4 Request对象
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.5" data-path="../3.蓝图、模型与CodeFirst/3.5 WTForms参数验证.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.5 WTForms参数验证.html">
+            
+                    
+                    3.5 WTForms参数验证
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.6" data-path="../3.蓝图、模型与CodeFirst/3.6 配置文件拆分.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.6 配置文件拆分.html">
+            
+                    
+                    3.6 配置文件拆分
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.7" data-path="../3.蓝图、模型与CodeFirst/3.7 Model First、Database First与Code First.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.7 Model First、Database First与Code First.html">
+            
+                    
+                    3.7 数据表创建方式
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.8" data-path="../3.蓝图、模型与CodeFirst/3.8 定义第一个模型类.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.8 定义第一个模型类.html">
+            
+                    
+                    3.8 定义第一个模型类以及反向生成
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../4.flask核心机制/">
+            
+                <a href="../4.flask核心机制/">
+            
+                    
+                    4.flask核心机制
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="../4.flask核心机制/4.1 flask中经典错误 working outside application context.html">
+            
+                <a href="../4.flask核心机制/4.1 flask中经典错误 working outside application context.html">
+            
+                    
+                    4.1 flask中经典错误 working outside application context
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="../4.flask核心机制/4.2 AppContext、RequestContext、Flask与Request之间的关系.html">
+            
+                <a href="../4.flask核心机制/4.2 AppContext、RequestContext、Flask与Request之间的关系.html">
+            
+                    
+                    4.2 AppContext、RequestContext、Flask与Request之间的关系
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="../4.flask核心机制/4.3 详解flask上下文与出入栈.html">
+            
+                <a href="../4.flask核心机制/4.3 详解flask上下文与出入栈.html">
+            
+                    
+                    4.3 详解flask上下文与出入栈
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.4" data-path="../4.flask核心机制/4.4 flask上下文与with语句.html">
+            
+                <a href="../4.flask核心机制/4.4 flask上下文与with语句.html">
+            
+                    
+                    4.4 flask上下文与with语句
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.5" data-path="../4.flask核心机制/4.6 阅读源码解决db.create_all的问题.html">
+            
+                <a href="../4.flask核心机制/4.6 阅读源码解决db.create_all的问题.html">
+            
+                    
+                    4.5 阅读源码解决db.create_all的问题
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    5.Flask中的多线程与线程隔离技术
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.6.1" data-path="5.1 线程进程与多线程.html">
+            
+                <a href="5.1 线程进程与多线程.html">
+            
+                    
+                    5.1 线程进程与多线程
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.2" data-path="5.2 全局解释器锁GIL.html">
+            
+                <a href="5.2 全局解释器锁GIL.html">
+            
+                    
+                    5.2 Python和Flask的多线程
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.6.3" data-path="5.5 Flask中的线程隔离.html">
+            
+                <a href="5.5 Flask中的线程隔离.html">
+            
+                    
+                    5.3 Flask中的线程隔离
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.4" data-path="5.6 梳理串接flask的一些名词.html">
+            
+                <a href="5.6 梳理串接flask的一些名词.html">
+            
+                    
+                    5.4 梳理串接flask的一些名词
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7" data-path="../6.书籍详情页面的构建/">
+            
+                <a href="../6.书籍详情页面的构建/">
+            
+                    
+                    6.书籍详情页面的构建
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.7.1" data-path="../6.书籍详情页面的构建/6.1 ViewModel的基本概念.html">
+            
+                <a href="../6.书籍详情页面的构建/6.1 ViewModel的基本概念.html">
+            
+                    
+                    6.1 ViewModel的基本概念
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7.2" data-path="../6.书籍详情页面的构建/6.2 使用ViewModel处理书籍数据.html">
+            
+                <a href="../6.书籍详情页面的构建/6.2 使用ViewModel处理书籍数据.html">
+            
+                    
+                    6.2 使用ViewModel处理书籍数据
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7.3" data-path="../6.书籍详情页面的构建/6.3 伪面向对象：披着面向对象外衣的面向过程.html">
+            
+                <a href="../6.书籍详情页面的构建/6.3 伪面向对象：披着面向对象外衣的面向过程.html">
+            
+                    
+                    6.3 伪面向对象：披着面向对象外衣的面向过程
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7.4" data-path="../6.书籍详情页面的构建/6.4 重构鱼书核心对象.html">
+            
+                <a href="../6.书籍详情页面的构建/6.4 重构鱼书核心对象.html">
+            
+                    
+                    6.4 重构鱼书核心对象
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7.5" data-path="../6.书籍详情页面的构建/6.5 从json序列化看代码解释权反转.html">
+            
+                <a href="../6.书籍详情页面的构建/6.5 从json序列化看代码解释权反转.html">
+            
+                    
+                    6.5 从json序列化看代码解释权反转
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7.6" data-path="../6.书籍详情页面的构建/6.6 详解单页面与网站的区别.html">
+            
+                <a href="../6.书籍详情页面的构建/6.6 详解单页面与网站的区别.html">
+            
+                    
+                    6.6 详解单页面与网站的区别
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8" data-path="../7.静态文件、模板、消息闪现与Jinja2/">
+            
+                <a href="../7.静态文件、模板、消息闪现与Jinja2/">
+            
+                    
+                    7.静态文件、模板、消息闪现与Jinja2
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.8.1" data-path="../7.静态文件、模板、消息闪现与Jinja2/7.1 静态文件访问原理.html">
+            
+                <a href="../7.静态文件、模板、消息闪现与Jinja2/7.1 静态文件访问原理.html">
+            
+                    
+                    7.1 静态文件访问原理
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8.2" data-path="../7.静态文件、模板、消息闪现与Jinja2/7.2 模板文件的位置与修改方案_x264.html">
+            
+                <a href="../7.静态文件、模板、消息闪现与Jinja2/7.2 模板文件的位置与修改方案_x264.html">
+            
+                    
+                    7.2 模板文件的位置与修改方案_x264
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8.3" data-path="../7.静态文件、模板、消息闪现与Jinja2/7.6 过滤器与管道命令.html">
+            
+                <a href="../7.静态文件、模板、消息闪现与Jinja2/7.6 过滤器与管道命令.html">
+            
+                    
+                    7.4 过滤器与管道命令
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8.4" data-path="../7.静态文件、模板、消息闪现与Jinja2/7.7 反向构建URL.html">
+            
+                <a href="../7.静态文件、模板、消息闪现与Jinja2/7.7 反向构建URL.html">
+            
+                    
+                    7.5 反向构建URL
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8.5" data-path="../7.静态文件、模板、消息闪现与Jinja2/7.8 消息闪现、SecretyKey与变量作用域.html">
+            
+                <a href="../7.静态文件、模板、消息闪现与Jinja2/7.8 消息闪现、SecretyKey与变量作用域.html">
+            
+                    
+                    7.6 消息闪现、SecretyKey与变量作用域
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9" data-path="../8.用户登录与注册/">
+            
+                <a href="../8.用户登录与注册/">
+            
+                    
+                    8.用户登录与注册
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.9.1" data-path="../8.用户登录与注册/8.1 viewmodel意义的体现与filter函数的巧妙应用.html">
+            
+                <a href="../8.用户登录与注册/8.1 viewmodel意义的体现与filter函数的巧妙应用.html">
+            
+                    
+                    8.1 viewmodel意义的体现与filter函数的巧妙应用
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9.2" data-path="../8.用户登录与注册/8.2 书籍详情页面.html">
+            
+                <a href="../8.用户登录与注册/8.2 书籍详情页面.html">
+            
+                    
+                    8.2 书籍详情页面
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9.3" data-path="../8.用户登录与注册/8.3 模型关系.html">
+            
+                <a href="../8.用户登录与注册/8.3 模型关系.html">
+            
+                    
+                    8.3 模型关系
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9.4" data-path="../8.用户登录与注册/8.4 用户注册.html">
+            
+                <a href="../8.用户登录与注册/8.4 用户注册.html">
+            
+                    
+                    8.4 用户注册
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9.5" data-path="../8.用户登录与注册/8.5 用户登录.html">
+            
+                <a href="../8.用户登录与注册/8.5 用户登录.html">
+            
+                    
+                    8.5 用户登录
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9.6" data-path="../8.用户登录与注册/8.6 访问权限控制与重定向攻击.html">
+            
+                <a href="../8.用户登录与注册/8.6 访问权限控制与重定向攻击.html">
+            
+                    
+                    8.6 访问权限控制与重定向攻击
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.10" data-path="../9.书籍交易模型/">
+            
+                <a href="../9.书籍交易模型/">
+            
+                    
+                    9.书籍交易模型（数据库事务、重写Flask中的对象
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.10.1" data-path="../9.书籍交易模型/9.1 鱼豆.html">
+            
+                <a href="../9.书籍交易模型/9.1 鱼豆.html">
+            
+                    
+                    9.1 鱼豆
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.10.2" data-path="../9.书籍交易模型/9.1 contextmanager.html">
+            
+                <a href="../9.书籍交易模型/9.1 contextmanager.html">
+            
+                    
+                    9.2 contextmanager
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.10.3" data-path="../9.书籍交易模型/9.3 书籍交易视图模型.html">
+            
+                <a href="../9.书籍交易模型/9.3 书籍交易视图模型.html">
+            
+                    
+                    9.3 书籍交易视图模型
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.10.4" data-path="../9.书籍交易模型/9.4 重写filter_by.html">
+            
+                <a href="../9.书籍交易模型/9.4 重写filter_by.html">
+            
+                    
+                    9.4 重写filter_by
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.11" data-path="../10.鱼书业务处理/">
+            
+                <a href="../10.鱼书业务处理/">
+            
+                    
+                    10.鱼书业务处理
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.11.1" data-path="../10.鱼书业务处理/10.1 最近的礼物.html">
+            
+                <a href="../10.鱼书业务处理/10.1 最近的礼物.html">
+            
+                    
+                    10.1 最近的礼物
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.11.2" data-path="../10.鱼书业务处理/10.2 我的礼物.html">
+            
+                <a href="../10.鱼书业务处理/10.2 我的礼物.html">
+            
+                    
+                    10.2 我的礼物（赠送清单）
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.11.3" data-path="../10.鱼书业务处理/10.3 我的心愿.html">
+            
+                <a href="../10.鱼书业务处理/10.3 我的心愿.html">
+            
+                    
+                    10.3 我的心愿（心愿清单）
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12" data-path="../11.Python与Flask的结合应用/">
+            
+                <a href="../11.Python与Flask的结合应用/">
+            
+                    
+                    11.Python与Flask的结合应用
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.12.1" data-path="../11.Python与Flask的结合应用/11.1 忘记密码.html">
+            
+                <a href="../11.Python与Flask的结合应用/11.1 忘记密码.html">
+            
+                    
+                    11.1 重置密码流程分析
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12.2" data-path="../11.Python与Flask的结合应用/11.2 first_or_404和可调用对象.html">
+            
+                <a href="../11.Python与Flask的结合应用/11.2 first_or_404和可调用对象.html">
+            
+                    
+                    11.2 first_or_404和可调用对象
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12.3" data-path="../11.Python与Flask的结合应用/11.3 HttpException.html">
+            
+                <a href="../11.Python与Flask的结合应用/11.3 HttpException.html">
+            
+                    
+                    11.3 HttpException
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12.4" data-path="../11.Python与Flask的结合应用/11.4 发送电子邮件.html">
+            
+                <a href="../11.Python与Flask的结合应用/11.4 发送电子邮件.html">
+            
+                    
+                    11.4 重置密码
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12.5" data-path="../11.Python与Flask的结合应用/11.5 鱼漂.html">
+            
+                <a href="../11.Python与Flask的结合应用/11.5 鱼漂.html">
+            
+                    
+                    11.5 发送鱼漂
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12.6" data-path="../11.Python与Flask的结合应用/11.5 交易记录.html">
+            
+                <a href="../11.Python与Flask的结合应用/11.5 交易记录.html">
+            
+                    
+                    11.6 交易记录
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12.7" data-path="../11.Python与Flask的结合应用/11.7 撤销操作.html">
+            
+                <a href="../11.Python与Flask的结合应用/11.7 撤销操作.html">
+            
+                    
+                    11.7 其他操作
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >5.3 Flask中的线程隔离</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="53-flask&#x4E2D;&#x7684;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;">5.3 Flask&#x4E2D;&#x7684;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;</h1>
+<p>Flask&#x5185;&#x90E8;&#xFF0C;&#x901A;&#x8FC7;&#x7EF4;&#x62A4;&#x4E00;&#x4E2A;dict&#x6765;&#x5B9E;&#x73B0;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x3002;&#x4F2A;&#x4EE3;&#x7801;&#x5982;&#x4E0B;
+request={thread_key1:Request1,thread_key2:Request2}
+&#x5176;&#x4E2D;thread_key&#x662F;&#x7EBF;&#x7A0B;&#x7684;&#x552F;&#x4E00;id&#x53F7;&#xFF0C;Request&#x5C31;&#x662F;&#x6BCF;&#x6B21;&#x8BF7;&#x6C42;&#x7684;Request&#x5BF9;&#x8C61;</p>
+<p>Flask&#x5185;&#x90E8;&#x5F15;&#x5165;&#x4E86;&#x4E00;&#x4E2A;werkzeug&#x7684;&#x5E93;&#xFF0C;&#x8FD9;&#x4E2A;&#x5E93;&#x91CC;&#x6709;&#x4E00;&#x4E2A;local&#x6A21;&#x5757;&#xFF0C;&#x91CC;&#x9762;&#x6709;&#x4E00;&#x4E2A;Local&#x5BF9;&#x8C61;&#xFF0C;Flask&#x5185;&#x90E8;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x5C31;&#x662F;&#x901A;&#x8FC7;&#x64CD;&#x4F5C;Local&#x5BF9;&#x8C61;&#x5B9E;&#x73B0;&#x7684;&#x3002;</p>
+<h2 id="1-local&#x5BF9;&#x8C61;">1. Local&#x5BF9;&#x8C61;</h2>
+<p>Local&#x5BF9;&#x8C61;&#x5B9E;&#x9645;&#x4E0A;&#x5C31;&#x662F;&#x5BF9;&#x5B57;&#x5178;&#x539F;&#x7406;&#x7684;&#x4E00;&#x4E2A;&#x5C01;&#x88C5;</p>
+<pre><code class="lang-python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Local</span><span class="hljs-params">(object)</span>:</span>
+    __slots__ = (<span class="hljs-string">&apos;__storage__&apos;</span>, <span class="hljs-string">&apos;__ident_func__&apos;</span>)
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self)</span>:</span>
+        <span class="hljs-comment"># &#x4E00;&#x4E2A;&#x79C1;&#x6709;&#x53D8;&#x91CF;__storage__&#x5B57;&#x5178;</span>
+        object.__setattr__(self, <span class="hljs-string">&apos;__storage__&apos;</span>, {})
+        object.__setattr__(self, <span class="hljs-string">&apos;__ident_func__&apos;</span>, get_ident)
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__iter__</span><span class="hljs-params">(self)</span>:</span>
+        <span class="hljs-keyword">return</span> iter(self.__storage__.items())
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__call__</span><span class="hljs-params">(self, proxy)</span>:</span>
+        <span class="hljs-string">&quot;&quot;&quot;Create a proxy for a name.&quot;&quot;&quot;</span>
+        <span class="hljs-keyword">return</span> LocalProxy(self, proxy)
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__release_local__</span><span class="hljs-params">(self)</span>:</span>
+        self.__storage__.pop(self.__ident_func__(), <span class="hljs-keyword">None</span>)
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__getattr__</span><span class="hljs-params">(self, name)</span>:</span>
+        <span class="hljs-keyword">try</span>:
+            <span class="hljs-keyword">return</span> self.__storage__[self.__ident_func__()][name]
+        <span class="hljs-keyword">except</span> KeyError:
+            <span class="hljs-keyword">raise</span> AttributeError(name)
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__setattr__</span><span class="hljs-params">(self, name, value)</span>:</span>
+        <span class="hljs-comment"># &#x53D6;&#x5F53;&#x524D;&#x7EBF;&#x7A0B;&#x7684;&#x7EBF;&#x7A0B;ID&#x53F7;</span>
+        ident = self.__ident_func__()
+        storage = self.__storage__
+        <span class="hljs-comment"># &#x64CD;&#x4F5C;&#x5B57;&#x5178;</span>
+        <span class="hljs-keyword">try</span>:
+            storage[ident][name] = value
+        <span class="hljs-keyword">except</span> KeyError:
+            <span class="hljs-comment"># &#x628A;&#x7EBF;&#x7A0B;id&#x53F7;&#x4F5C;&#x4E3A;key&#x4FDD;&#x5B58;&#x4E86;&#x8D77;&#x6765;</span>
+            storage[ident] = {name: value}
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__delattr__</span><span class="hljs-params">(self, name)</span>:</span>
+        <span class="hljs-keyword">try</span>:
+            <span class="hljs-keyword">del</span> self.__storage__[self.__ident_func__()][name]
+        <span class="hljs-keyword">except</span> KeyError:
+            <span class="hljs-keyword">raise</span> AttributeError(name)
+</code></pre>
+<h3 id="&#x4F7F;&#x7528;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x548C;&#x4E0D;&#x9002;&#x7528;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x7684;&#x533A;&#x522B;">&#x4F7F;&#x7528;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x548C;&#x4E0D;&#x9002;&#x7528;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x7684;&#x533A;&#x522B;</h3>
+<p>&#x5B9A;&#x4E49;&#x4E00;&#x4E2A;&#x5BF9;&#x8C61;&#xFF0C;&#x542F;&#x52A8;&#x4E00;&#x4E2A;&#x7EBF;&#x7A0B;&#x53BB;&#x4FEE;&#x6539;&#x8FD9;&#x4E2A;&#x5BF9;&#x8C61;&#xFF0C;&#x4F7F;&#x7528;&#x4E3B;&#x7EBF;&#x7A0B;&#x6253;&#x5370;&#x8FD9;&#x4E2A;&#x5BF9;&#x8C61;</p>
+<pre><code class="lang-python"><span class="hljs-keyword">import</span> threading
+<span class="hljs-keyword">import</span> time
+
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span>:</span>
+    b = <span class="hljs-number">1</span>
+
+
+my_obj = A()
+
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">worker</span><span class="hljs-params">()</span>:</span>
+    my_obj.b = <span class="hljs-number">2</span>
+
+
+new_thread = threading.Thread(target=worker, name=<span class="hljs-string">&quot;new_thread&quot;</span>)
+new_thread.start()
+time.sleep(<span class="hljs-number">1</span>)
+
+<span class="hljs-comment"># &#x4E3B;&#x7EBF;&#x7A0B;</span>
+print(my_obj.b)
+</code></pre>
+<pre><code># &#x6253;&#x5370;&#x7ED3;&#x679C;&#x4E3A;2
+# &#x56E0;&#x4E3A;my_obj&#x662F;&#x4E3B;&#x7EBF;&#x7A0B;&#x548C;&#x65B0;&#x7EBF;&#x7A0B;&#x5171;&#x4EAB;&#x7684;&#x5BF9;&#x8C61;
+</code></pre><p>&#x5C06;my_obj&#x5B9E;&#x4F8B;&#x5316;&#x6539;&#x4E3A;&#x4F7F;&#x7528;Local&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x5BF9;&#x8C61;</p>
+<pre><code class="lang-python"><span class="hljs-keyword">import</span> threading
+<span class="hljs-keyword">import</span> time
+<span class="hljs-keyword">from</span> werkzeug.local <span class="hljs-keyword">import</span> Local
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span>:</span>
+    b = <span class="hljs-number">1</span>
+
+
+my_obj = Local()
+my_obj.b = <span class="hljs-number">1</span>
+
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">worker</span><span class="hljs-params">()</span>:</span>
+    my_obj.b = <span class="hljs-number">2</span>
+    print(<span class="hljs-string">&quot;in new thread b is: &quot;</span>, my_obj.b)
+
+
+new_thread = threading.Thread(target=worker, name=<span class="hljs-string">&quot;new_thread&quot;</span>)
+new_thread.start()
+time.sleep(<span class="hljs-number">1</span>)
+
+print(<span class="hljs-string">&quot;in main thread b is:&quot;</span>, my_obj.b)
+</code></pre>
+<pre><code># &#x7ED3;&#x679C;
+in new thread b is:  2
+in main thread b is: 1
+</code></pre><p>&#x7531;&#x4E8E;my_obj&#x662F;&#x4E00;&#x4E2A;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x7684;&#x5BF9;&#x8C61;&#xFF0C;&#x6240;&#x4EE5;&#x6211;&#x4EEC;&#x5728;&#x65B0;&#x7EBF;&#x7A0B;&#x91CC;&#x4FEE;&#x6539;my_obj&#x662F;&#x4E0D;&#x4F1A;&#x5F71;&#x54CD;&#x4E3B;&#x7EBF;&#x7A0B;&#x91CC;my_obj&#x4E2D;&#x7684;&#x503C;&#x7684;&#x3002;&#x4ED6;&#x4EEC;&#x4FDD;&#x6301;&#x4E86;&#x4E24;&#x4E2A;&#x7EBF;&#x7A0B;&#x4E4B;&#x95F4;&#x7684;&#x6570;&#x636E;&#x7684;&#x72EC;&#x7ACB;</p>
+<p>Local&#x7684;&#x9AD8;&#x660E;&#x5728;&#x4E8E;&#xFF0C;&#x4ED6;&#x4E0D;&#x9700;&#x8981;&#x6211;&#x4EEC;&#x53BB;&#x5173;&#x5FC3;&#x5E95;&#x5C42;Local&#x5B57;&#x5178;&#x5185;&#x90E8;&#x7684;&#x7EC6;&#x8282;&#xFF0C;&#x6211;&#x4EEC;&#x4E4B;&#x95F4;&#x53BB;&#x64CD;&#x4F5C;Local&#x5BF9;&#x8C61;&#x7684;&#x76F8;&#x5173;&#x5C5E;&#x6027;&#xFF0C;&#x8FD9;&#x4E2A;&#x64CD;&#x4F5C;&#x672C;&#x5C31;&#x662F;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x7684;&#xFF0C;&#x7ED9;&#x6211;&#x4EEC;&#x5E26;&#x6765;&#x4E86;&#x5F88;&#x5927;&#x7684;&#x65B9;&#x4FBF;</p>
+<h2 id="2-&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x7684;&#x6808;&#xFF1A;localstack">2. &#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x7684;&#x6808;&#xFF1A;LocalStack</h2>
+<p><img src="https://upload-images.jianshu.io/upload_images/7220971-cf45bd1876fcf08d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<p>&#x63A5;&#x4E0B;&#x6765;&#x6765;&#x7EE7;&#x7EED;&#x8BB2;&#x89E3;&#x4E4B;&#x524D;&#x8FD9;&#x5F20;&#x56FE;&#x53F3;&#x4E0B;&#x89D2;&#x7684;&#x90E8;&#x5206;&#x3002;
+&#x901A;&#x8FC7;Flask&#x7684;&#x6E90;&#x7801;&#xFF0C;&#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x4E86;&#x89E3;&#x5230;_app_ctx_stack&#x548C;_request_ctx_stack&#x5B9E;&#x9645;&#x4E0A;&#x662F;&#x6307;&#x5411;&#x4E86;LocalStack()&#x5BF9;&#x8C61;&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x4E00;&#x4E2A;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x7684;&#x6808;,&#x4E0B;&#x9762;&#x6765;&#x770B;&#x4E0B;&#x6E90;&#x7801;</p>
+<p>globals.py</p>
+<pre><code class="lang-python"><span class="hljs-comment"># context locals</span>
+<span class="hljs-comment"># &#x662F;&#x4E00;&#x4E2A;LocalStack&#x5BF9;&#x8C61;</span>
+_request_ctx_stack = LocalStack()
+_app_ctx_stack = LocalStack()
+current_app = LocalProxy(_find_app)
+request = LocalProxy(partial(_lookup_req_object, <span class="hljs-string">&apos;request&apos;</span>))
+session = LocalProxy(partial(_lookup_req_object, <span class="hljs-string">&apos;session&apos;</span>))
+g = LocalProxy(partial(_lookup_app_object, <span class="hljs-string">&apos;g&apos;</span>))
+</code></pre>
+<p>LocalStack&#x6E90;&#x7801;&#xFF0C;&#x4F9D;&#x65E7;&#x5728;werkzeug&#x5E93; &#x7684;local&#x6A21;&#x5757;&#x4E0B;</p>
+<pre><code class="lang-python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LocalStack</span><span class="hljs-params">(object)</span>:</span>
+
+    <span class="hljs-string">&quot;&quot;&quot;This class works similar to a :class:`Local` but keeps a stack
+    of objects instead.  This is best explained with an example::
+
+        &gt;&gt;&gt; ls = LocalStack()
+        &gt;&gt;&gt; ls.push(42)
+        &gt;&gt;&gt; ls.top
+        42
+        &gt;&gt;&gt; ls.push(23)
+        &gt;&gt;&gt; ls.top
+        23
+        &gt;&gt;&gt; ls.pop()
+        23
+        &gt;&gt;&gt; ls.top
+        42
+
+    They can be force released by using a :class:`LocalManager` or with
+    the :func:`release_local` function but the correct way is to pop the
+    item from the stack after using.  When the stack is empty it will
+    no longer be bound to the current context (and as such released).
+
+    By calling the stack without arguments it returns a proxy that resolves to
+    the topmost item on the stack.
+
+    .. versionadded:: 0.6.1
+    &quot;&quot;&quot;</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self)</span>:</span>
+        <span class="hljs-comment"># &#x5185;&#x90E8;&#x7EF4;&#x62A4;&#x4E86;&#x4E00;&#x4E2A;Local&#x5BF9;&#x8C61;&#x4F5C;&#x4E3A;&#x79C1;&#x6709;&#x53D8;&#x91CF;</span>
+        self._local = Local()
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__release_local__</span><span class="hljs-params">(self)</span>:</span>
+        self._local.__release_local__()
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_get__ident_func__</span><span class="hljs-params">(self)</span>:</span>
+        <span class="hljs-keyword">return</span> self._local.__ident_func__
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_set__ident_func__</span><span class="hljs-params">(self, value)</span>:</span>
+        object.__setattr__(self._local, <span class="hljs-string">&apos;__ident_func__&apos;</span>, value)
+    __ident_func__ = property(_get__ident_func__, _set__ident_func__)
+    <span class="hljs-keyword">del</span> _get__ident_func__, _set__ident_func__
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__call__</span><span class="hljs-params">(self)</span>:</span>
+        <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_lookup</span><span class="hljs-params">()</span>:</span>
+            rv = self.top
+            <span class="hljs-keyword">if</span> rv <span class="hljs-keyword">is</span> <span class="hljs-keyword">None</span>:
+                <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&apos;object unbound&apos;</span>)
+            <span class="hljs-keyword">return</span> rv
+        <span class="hljs-keyword">return</span> LocalProxy(_lookup)
+
+    <span class="hljs-comment"># &#x63D0;&#x4F9B;&#x4E86;push&#xFF0C;pop&#x65B9;&#x6CD5;&#xFF0C;&#x5B9E;&#x9645;&#x4E0A;&#x5C31;&#x662F;&#x5728;&#x64CD;&#x4F5C;Local&#x4E2D;&#x7684;&#x4E00;&#x4E2A;Stack</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">push</span><span class="hljs-params">(self, obj)</span>:</span>
+        <span class="hljs-string">&quot;&quot;&quot;Pushes a new item to the stack&quot;&quot;&quot;</span>
+        rv = getattr(self._local, <span class="hljs-string">&apos;stack&apos;</span>, <span class="hljs-keyword">None</span>)
+        <span class="hljs-keyword">if</span> rv <span class="hljs-keyword">is</span> <span class="hljs-keyword">None</span>:
+            self._local.stack = rv = []
+        rv.append(obj)
+        <span class="hljs-keyword">return</span> rv
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">pop</span><span class="hljs-params">(self)</span>:</span>
+        <span class="hljs-string">&quot;&quot;&quot;Removes the topmost item from the stack, will return the
+        old value or `None` if the stack was already empty.
+        &quot;&quot;&quot;</span>
+        stack = getattr(self._local, <span class="hljs-string">&apos;stack&apos;</span>, <span class="hljs-keyword">None</span>)
+        <span class="hljs-keyword">if</span> stack <span class="hljs-keyword">is</span> <span class="hljs-keyword">None</span>:
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">None</span>
+        <span class="hljs-keyword">elif</span> len(stack) == <span class="hljs-number">1</span>:
+            release_local(self._local)
+            <span class="hljs-keyword">return</span> stack[<span class="hljs-number">-1</span>]
+        <span class="hljs-keyword">else</span>:
+            <span class="hljs-keyword">return</span> stack.pop()
+
+<span class="hljs-meta">    @property</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">top</span><span class="hljs-params">(self)</span>:</span>
+        <span class="hljs-string">&quot;&quot;&quot;The topmost item on the stack.  If the stack is empty,
+        `None` is returned.
+        &quot;&quot;&quot;</span>
+        <span class="hljs-keyword">try</span>:
+            <span class="hljs-keyword">return</span> self._local.stack[<span class="hljs-number">-1</span>]
+        <span class="hljs-keyword">except</span> (AttributeError, IndexError):
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">None</span>
+</code></pre>
+<blockquote>
+<h3 id="locallocal-stack&#x5B57;&#x5178;&#x7684;&#x5173;&#x7CFB;">Local,Local Stack,&#x5B57;&#x5178;&#x7684;&#x5173;&#x7CFB;</h3>
+<p>Local&#x4F7F;&#x7528;&#x5B57;&#x5178;&#x7684;&#x65B9;&#x5F0F;&#x5B9E;&#x73B0;&#x4E86;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;
+Local Stack&#x5C01;&#x88C5;&#x4E86;Local&#x5BF9;&#x8C61;&#xFF0C;&#x5C06;&#x5176;&#x4F5C;&#x4E3A;&#x81EA;&#x5DF1;&#x7684;&#x4E00;&#x4E2A;&#x5C5E;&#x6027;&#xFF0C;&#x5B9E;&#x73B0;&#x4E86;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x7684;&#x6808;&#x7ED3;&#x6784;</p>
+</blockquote>
+<h2 id="3localstack&#x7684;&#x57FA;&#x672C;&#x7528;&#x6CD5;">3.LocalStack&#x7684;&#x57FA;&#x672C;&#x7528;&#x6CD5;</h2>
+<p>Local&#x662F;&#x4F7F;&#x7528;&#xB7;&#x6765;&#x76F4;&#x63A5;&#x64CD;&#x4F5C;&#x5B57;&#x5178;&#x4E2D;&#x4FDD;&#x5B58;&#x7684;&#x5BF9;&#x8C61;&#x3002;
+LocalStack&#x662F;&#x4F7F;&#x7528;&#x5B83;&#x63D0;&#x4F9B;&#x7684;&#x4E00;&#x4E9B;push&#xFF0C;pop&#x7684;&#x6808;&#x65B9;&#x6CD5;&#x6765;&#x64CD;&#x4F5C;&#x5BF9;&#x8C61;</p>
+<pre><code class="lang-python"><span class="hljs-keyword">from</span> werkzeug.local <span class="hljs-keyword">import</span> LocalStack
+
+__author__ = <span class="hljs-string">&quot;gaowenfeng&quot;</span>
+
+s = LocalStack()
+
+s.push(<span class="hljs-number">1</span>)
+s.push(<span class="hljs-number">2</span>)
+
+<span class="hljs-comment"># top&#x662F;&#x5C5E;&#x6027;@property,&#x6240;&#x4EE5;&#x4E0D;&#x9700;&#x8981;&#x52A0;&#x62EC;&#x53F7;&#x8C03;&#x7528;&#xFF1B;</span>
+<span class="hljs-comment"># &#x6808;&#x7ED3;&#x6784;&#x5148;&#x8FDB;&#x540E;&#x51FA;&#xFF0C;&#x6240;&#x4EE5;&#x5148;&#x8F93;&#x51FA;2</span>
+print(s.top)
+<span class="hljs-comment"># top&#x53EA;&#x53D6;&#x6808;&#x9876;&#x5143;&#x7D20;&#xFF0C;&#x4E0D;&#x4F1A;&#x8BB2;&#x4ED6;&#x4ECE;&#x6808;&#x4E2D;&#x79FB;&#x9664;&#xFF0C;&#x6240;&#x4EE5;&#x8FD9;&#x6B21;&#x8FD8;&#x662F;2</span>
+print(s.top)
+<span class="hljs-comment"># pop()&#x662F;&#x65B9;&#x6CD5;&#xFF0C;&#x4F1A;&#x53D6;&#x51FA;&#x5E76;&#x79FB;&#x9664;&#x6808;&#x9876;&#x5143;&#x7D20;</span>
+print(s.pop())
+print(s.top)
+</code></pre>
+<pre><code># &#x7ED3;&#x679C;
+2
+2
+2
+1
+</code></pre><h2 id="4localstack&#x4F5C;&#x4E3A;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x5BF9;&#x8C61;&#x7684;&#x610F;&#x4E49;">4.LocalStack&#x4F5C;&#x4E3A;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x5BF9;&#x8C61;&#x7684;&#x610F;&#x4E49;</h2>
+<p><img src="https://upload-images.jianshu.io/upload_images/7220971-488f9cb2b0e3475e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png">
+&#x4ECE;&#x4E0A;&#x5230;&#x4E0B;&#xFF0C;&#x56DB;&#x4E2A;&#x6253;&#x5370;&#x8BED;&#x53E5;&#x5206;&#x522B;&#x6253;&#x5370;1&#xFF0C;NULL,2,1&#xFF1B;&#x7B80;&#x5355;&#x6765;&#x8BF4;&#xFF0C;&#x5C31;&#x662F;&#x4E24;&#x4E2A;&#x7EBF;&#x7A0B;&#x4F1A;&#x6709;&#x4E24;&#x4E2A;&#x6808;&#x7ED3;&#x6784;&#xFF0C;&#x4ED6;&#x4EEC;&#x4E4B;&#x95F4;&#x4E0D;&#x4F1A;&#x4E92;&#x76F8;&#x5E72;&#x6270;&#x3002;&#x8FD9;&#x5C31;&#x662F;LocalStack&#x7684;&#x610F;&#x4E49;</p>
+<h2 id="5flask&#x4E2D;&#x88AB;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x7684;&#x5BF9;&#x8C61;">5.Flask&#x4E2D;&#x88AB;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x7684;&#x5BF9;&#x8C61;</h2>
+<p>LocalStack&#x6709;&#x4E24;&#x4E2A;&#x7279;&#x6027;&#xFF0C;&#x4E00;&#x4E2A;&#x662F;Local&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x7684;&#x7279;&#x6027;&#xFF0C;&#x4E00;&#x4E2A;&#x662F;&#x6808;&#x7684;&#x7279;&#x6027;&#x3002;
+Flask&#x9700;&#x8981;&#x5C06;AppContext&#xFF0C;RequestContext&#x505A;&#x6210;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x7684;&#xFF0C;&#x56E0;&#x4E3A;&#x6BCF;&#x6B21;&#x8BF7;&#x6C42;&#xFF0C;&#x5728;&#x591A;&#x7EBF;&#x7A0B;&#x73AF;&#x5883;&#x4E0B;&#x90FD;&#x662F;&#x7531;&#x591A;&#x4E2A;&#x7EBF;&#x7A0B;&#x521B;&#x5EFA;&#x3002;
+&#x6211;&#x4EEC;&#x60F3;&#x8BA9;request&#x8FD9;&#x4E00;&#x4E2A;&#x53D8;&#x91CF;&#x540D;&#x6307;&#x5411;&#x4E0D;&#x540C;&#x7684;Request&#x5BF9;&#x8C61;&#x662F;&#x4E0D;&#x53EF;&#x80FD;&#x7684;&#x3002;
+<img src="https://upload-images.jianshu.io/upload_images/7220971-c90e5994d4259d82.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<p>&#x4F46;&#x662F;&#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x505A;&#x5230;&#x5728;&#x5F53;&#x524D;&#x7EBF;&#x7A0B;&#x5F15;&#x7528;&#x5230;request&#x53D8;&#x91CF;&#x540D;&#x7684;&#x65F6;&#x5019;&#x53EF;&#x4EE5;&#x6B63;&#x786E;&#x7684;&#x627E;&#x5230;&#x4ED6;&#x81EA;&#x5DF1;&#x5B9E;&#x4F8B;&#x5316;&#x7684;Request&#x5BF9;&#x8C61;&#xFF0C;&#x8FD9;&#x5C31;&#x662F;Flask&#x4E2D;&#x7EBF;&#x7A0B;&#x9694;&#x79BB;&#x7684;&#x672C;&#x8D28;&#x7684;&#x610F;&#x4E49;</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="5.2 全局解释器锁GIL.html" class="navigation navigation-prev " aria-label="Previous page: 5.2 Python和Flask的多线程">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="5.6 梳理串接flask的一些名词.html" class="navigation navigation-next " aria-label="Next page: 5.4 梳理串接flask的一些名词">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"5.3 Flask中的线程隔离","level":"1.6.3","depth":2,"next":{"title":"5.4 梳理串接flask的一些名词","level":"1.6.4","depth":2,"path":"5.Flask中的多线程与线程隔离技术/5.6 梳理串接flask的一些名词.md","ref":"5.Flask中的多线程与线程隔离技术/5.6 梳理串接flask的一些名词.md","articles":[]},"previous":{"title":"5.2 Python和Flask的多线程","level":"1.6.2","depth":2,"path":"5.Flask中的多线程与线程隔离技术/5.2 全局解释器锁GIL.md","ref":"5.Flask中的多线程与线程隔离技术/5.2 全局解释器锁GIL.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["livereload"],"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"5.Flask中的多线程与线程隔离技术/5.5 Flask中的线程隔离.md","mtime":"2018-06-15T03:11:05.000Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-11-27T01:29:53.294Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-livereload/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

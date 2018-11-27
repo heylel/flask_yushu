@@ -1,0 +1,1208 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>4.2 AppContext、RequestContext、Flask与Request之间的关系 · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="4.3 详解flask上下文与出入栈.html" />
+    
+    
+    <link rel="prev" href="4.1 flask中经典错误 working outside application context.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    介绍
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../1.项目准备与flask基础/">
+            
+                <a href="../1.项目准备与flask基础/">
+            
+                    
+                    1.项目准备与flask基础
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="../1.项目准备与flask基础/1.1pipenv 安装与使用.html">
+            
+                <a href="../1.项目准备与flask基础/1.1pipenv 安装与使用.html">
+            
+                    
+                    1.1 pipenv 安装与使用
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="../1.项目准备与flask基础/2.flask 入门基础.html">
+            
+                <a href="../1.项目准备与flask基础/2.flask 入门基础.html">
+            
+                    
+                    1.2 flask 入门基础
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="../2.搜索书籍路由编写/">
+            
+                <a href="../2.搜索书籍路由编写/">
+            
+                    
+                    2.数据与flask路由
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="../2.搜索书籍路由编写/2.1 定义参数，判断查询参数q是否是isbn号.html">
+            
+                <a href="../2.搜索书籍路由编写/2.1 定义参数，判断查询参数q是否是isbn号.html">
+            
+                    
+                    2.1 定义参数，判断查询参数q是否是isbn号
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="../2.搜索书籍路由编写/2.2 简单的重构.html">
+            
+                <a href="../2.搜索书籍路由编写/2.2 简单的重构.html">
+            
+                    
+                    2.2 简单的重构
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="../2.搜索书籍路由编写/2.3 requests发送http请求及代码的简化手段.html">
+            
+                <a href="../2.搜索书籍路由编写/2.3 requests发送http请求及代码的简化手段.html">
+            
+                    
+                    2.3 requests发送http请求及代码的简化手段
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="../2.搜索书籍路由编写/2.4 requests vs urllib.html">
+            
+                <a href="../2.搜索书籍路由编写/2.4 requests vs urllib.html">
+            
+                    
+                    2.4 requests vs urllib
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.5" data-path="../2.搜索书籍路由编写/2.5 从API获取数据.html">
+            
+                <a href="../2.搜索书籍路由编写/2.5 从API获取数据.html">
+            
+                    
+                    2.5 从API获取数据
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.6" data-path="../2.搜索书籍路由编写/2.6 将视图函数拆分到单独的模块中.html">
+            
+                <a href="../2.搜索书籍路由编写/2.6 将视图函数拆分到单独的模块中.html">
+            
+                    
+                    2.6 多模块拆分的误区
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="../3.蓝图、模型与CodeFirst/">
+            
+                <a href="../3.蓝图、模型与CodeFirst/">
+            
+                    
+                    3.蓝图、模型与CodeFirst
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.4.1" data-path="../3.蓝图、模型与CodeFirst/3.1 应用、蓝图与视图函数.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.1 应用、蓝图与视图函数.html">
+            
+                    
+                    3.1 应用、蓝图与视图函数
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="../3.蓝图、模型与CodeFirst/3.2 用蓝图注册试图函数.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.2 用蓝图注册试图函数.html">
+            
+                    
+                    3.2 用蓝图注册视图函数
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.3" data-path="../3.蓝图、模型与CodeFirst/3.3 单蓝图多模块拆分视图函数.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.3 单蓝图多模块拆分视图函数.html">
+            
+                    
+                    3.3 单蓝图多模块拆分视图函数
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.4" data-path="../3.蓝图、模型与CodeFirst/3.4 Request对象.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.4 Request对象.html">
+            
+                    
+                    3.4 Request对象
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.5" data-path="../3.蓝图、模型与CodeFirst/3.5 WTForms参数验证.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.5 WTForms参数验证.html">
+            
+                    
+                    3.5 WTForms参数验证
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.6" data-path="../3.蓝图、模型与CodeFirst/3.6 配置文件拆分.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.6 配置文件拆分.html">
+            
+                    
+                    3.6 配置文件拆分
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.7" data-path="../3.蓝图、模型与CodeFirst/3.7 Model First、Database First与Code First.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.7 Model First、Database First与Code First.html">
+            
+                    
+                    3.7 数据表创建方式
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.8" data-path="../3.蓝图、模型与CodeFirst/3.8 定义第一个模型类.html">
+            
+                <a href="../3.蓝图、模型与CodeFirst/3.8 定义第一个模型类.html">
+            
+                    
+                    3.8 定义第一个模型类以及反向生成
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    4.flask核心机制
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="4.1 flask中经典错误 working outside application context.html">
+            
+                <a href="4.1 flask中经典错误 working outside application context.html">
+            
+                    
+                    4.1 flask中经典错误 working outside application context
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.5.2" data-path="4.2 AppContext、RequestContext、Flask与Request之间的关系.html">
+            
+                <a href="4.2 AppContext、RequestContext、Flask与Request之间的关系.html">
+            
+                    
+                    4.2 AppContext、RequestContext、Flask与Request之间的关系
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="4.3 详解flask上下文与出入栈.html">
+            
+                <a href="4.3 详解flask上下文与出入栈.html">
+            
+                    
+                    4.3 详解flask上下文与出入栈
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.4" data-path="4.4 flask上下文与with语句.html">
+            
+                <a href="4.4 flask上下文与with语句.html">
+            
+                    
+                    4.4 flask上下文与with语句
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.5" data-path="4.6 阅读源码解决db.create_all的问题.html">
+            
+                <a href="4.6 阅读源码解决db.create_all的问题.html">
+            
+                    
+                    4.5 阅读源码解决db.create_all的问题
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" data-path="../5.Flask中的多线程与线程隔离技术/">
+            
+                <a href="../5.Flask中的多线程与线程隔离技术/">
+            
+                    
+                    5.Flask中的多线程与线程隔离技术
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.6.1" data-path="../5.Flask中的多线程与线程隔离技术/5.1 线程进程与多线程.html">
+            
+                <a href="../5.Flask中的多线程与线程隔离技术/5.1 线程进程与多线程.html">
+            
+                    
+                    5.1 线程进程与多线程
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.2" data-path="../5.Flask中的多线程与线程隔离技术/5.2 全局解释器锁GIL.html">
+            
+                <a href="../5.Flask中的多线程与线程隔离技术/5.2 全局解释器锁GIL.html">
+            
+                    
+                    5.2 Python和Flask的多线程
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.3" data-path="../5.Flask中的多线程与线程隔离技术/5.5 Flask中的线程隔离.html">
+            
+                <a href="../5.Flask中的多线程与线程隔离技术/5.5 Flask中的线程隔离.html">
+            
+                    
+                    5.3 Flask中的线程隔离
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6.4" data-path="../5.Flask中的多线程与线程隔离技术/5.6 梳理串接flask的一些名词.html">
+            
+                <a href="../5.Flask中的多线程与线程隔离技术/5.6 梳理串接flask的一些名词.html">
+            
+                    
+                    5.4 梳理串接flask的一些名词
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7" data-path="../6.书籍详情页面的构建/">
+            
+                <a href="../6.书籍详情页面的构建/">
+            
+                    
+                    6.书籍详情页面的构建
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.7.1" data-path="../6.书籍详情页面的构建/6.1 ViewModel的基本概念.html">
+            
+                <a href="../6.书籍详情页面的构建/6.1 ViewModel的基本概念.html">
+            
+                    
+                    6.1 ViewModel的基本概念
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7.2" data-path="../6.书籍详情页面的构建/6.2 使用ViewModel处理书籍数据.html">
+            
+                <a href="../6.书籍详情页面的构建/6.2 使用ViewModel处理书籍数据.html">
+            
+                    
+                    6.2 使用ViewModel处理书籍数据
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7.3" data-path="../6.书籍详情页面的构建/6.3 伪面向对象：披着面向对象外衣的面向过程.html">
+            
+                <a href="../6.书籍详情页面的构建/6.3 伪面向对象：披着面向对象外衣的面向过程.html">
+            
+                    
+                    6.3 伪面向对象：披着面向对象外衣的面向过程
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7.4" data-path="../6.书籍详情页面的构建/6.4 重构鱼书核心对象.html">
+            
+                <a href="../6.书籍详情页面的构建/6.4 重构鱼书核心对象.html">
+            
+                    
+                    6.4 重构鱼书核心对象
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7.5" data-path="../6.书籍详情页面的构建/6.5 从json序列化看代码解释权反转.html">
+            
+                <a href="../6.书籍详情页面的构建/6.5 从json序列化看代码解释权反转.html">
+            
+                    
+                    6.5 从json序列化看代码解释权反转
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.7.6" data-path="../6.书籍详情页面的构建/6.6 详解单页面与网站的区别.html">
+            
+                <a href="../6.书籍详情页面的构建/6.6 详解单页面与网站的区别.html">
+            
+                    
+                    6.6 详解单页面与网站的区别
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8" data-path="../7.静态文件、模板、消息闪现与Jinja2/">
+            
+                <a href="../7.静态文件、模板、消息闪现与Jinja2/">
+            
+                    
+                    7.静态文件、模板、消息闪现与Jinja2
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.8.1" data-path="../7.静态文件、模板、消息闪现与Jinja2/7.1 静态文件访问原理.html">
+            
+                <a href="../7.静态文件、模板、消息闪现与Jinja2/7.1 静态文件访问原理.html">
+            
+                    
+                    7.1 静态文件访问原理
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8.2" data-path="../7.静态文件、模板、消息闪现与Jinja2/7.2 模板文件的位置与修改方案_x264.html">
+            
+                <a href="../7.静态文件、模板、消息闪现与Jinja2/7.2 模板文件的位置与修改方案_x264.html">
+            
+                    
+                    7.2 模板文件的位置与修改方案_x264
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8.3" data-path="../7.静态文件、模板、消息闪现与Jinja2/7.6 过滤器与管道命令.html">
+            
+                <a href="../7.静态文件、模板、消息闪现与Jinja2/7.6 过滤器与管道命令.html">
+            
+                    
+                    7.4 过滤器与管道命令
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8.4" data-path="../7.静态文件、模板、消息闪现与Jinja2/7.7 反向构建URL.html">
+            
+                <a href="../7.静态文件、模板、消息闪现与Jinja2/7.7 反向构建URL.html">
+            
+                    
+                    7.5 反向构建URL
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.8.5" data-path="../7.静态文件、模板、消息闪现与Jinja2/7.8 消息闪现、SecretyKey与变量作用域.html">
+            
+                <a href="../7.静态文件、模板、消息闪现与Jinja2/7.8 消息闪现、SecretyKey与变量作用域.html">
+            
+                    
+                    7.6 消息闪现、SecretyKey与变量作用域
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9" data-path="../8.用户登录与注册/">
+            
+                <a href="../8.用户登录与注册/">
+            
+                    
+                    8.用户登录与注册
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.9.1" data-path="../8.用户登录与注册/8.1 viewmodel意义的体现与filter函数的巧妙应用.html">
+            
+                <a href="../8.用户登录与注册/8.1 viewmodel意义的体现与filter函数的巧妙应用.html">
+            
+                    
+                    8.1 viewmodel意义的体现与filter函数的巧妙应用
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9.2" data-path="../8.用户登录与注册/8.2 书籍详情页面.html">
+            
+                <a href="../8.用户登录与注册/8.2 书籍详情页面.html">
+            
+                    
+                    8.2 书籍详情页面
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9.3" data-path="../8.用户登录与注册/8.3 模型关系.html">
+            
+                <a href="../8.用户登录与注册/8.3 模型关系.html">
+            
+                    
+                    8.3 模型关系
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9.4" data-path="../8.用户登录与注册/8.4 用户注册.html">
+            
+                <a href="../8.用户登录与注册/8.4 用户注册.html">
+            
+                    
+                    8.4 用户注册
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9.5" data-path="../8.用户登录与注册/8.5 用户登录.html">
+            
+                <a href="../8.用户登录与注册/8.5 用户登录.html">
+            
+                    
+                    8.5 用户登录
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.9.6" data-path="../8.用户登录与注册/8.6 访问权限控制与重定向攻击.html">
+            
+                <a href="../8.用户登录与注册/8.6 访问权限控制与重定向攻击.html">
+            
+                    
+                    8.6 访问权限控制与重定向攻击
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.10" data-path="../9.书籍交易模型/">
+            
+                <a href="../9.书籍交易模型/">
+            
+                    
+                    9.书籍交易模型（数据库事务、重写Flask中的对象
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.10.1" data-path="../9.书籍交易模型/9.1 鱼豆.html">
+            
+                <a href="../9.书籍交易模型/9.1 鱼豆.html">
+            
+                    
+                    9.1 鱼豆
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.10.2" data-path="../9.书籍交易模型/9.1 contextmanager.html">
+            
+                <a href="../9.书籍交易模型/9.1 contextmanager.html">
+            
+                    
+                    9.2 contextmanager
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.10.3" data-path="../9.书籍交易模型/9.3 书籍交易视图模型.html">
+            
+                <a href="../9.书籍交易模型/9.3 书籍交易视图模型.html">
+            
+                    
+                    9.3 书籍交易视图模型
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.10.4" data-path="../9.书籍交易模型/9.4 重写filter_by.html">
+            
+                <a href="../9.书籍交易模型/9.4 重写filter_by.html">
+            
+                    
+                    9.4 重写filter_by
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.11" data-path="../10.鱼书业务处理/">
+            
+                <a href="../10.鱼书业务处理/">
+            
+                    
+                    10.鱼书业务处理
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.11.1" data-path="../10.鱼书业务处理/10.1 最近的礼物.html">
+            
+                <a href="../10.鱼书业务处理/10.1 最近的礼物.html">
+            
+                    
+                    10.1 最近的礼物
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.11.2" data-path="../10.鱼书业务处理/10.2 我的礼物.html">
+            
+                <a href="../10.鱼书业务处理/10.2 我的礼物.html">
+            
+                    
+                    10.2 我的礼物（赠送清单）
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.11.3" data-path="../10.鱼书业务处理/10.3 我的心愿.html">
+            
+                <a href="../10.鱼书业务处理/10.3 我的心愿.html">
+            
+                    
+                    10.3 我的心愿（心愿清单）
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12" data-path="../11.Python与Flask的结合应用/">
+            
+                <a href="../11.Python与Flask的结合应用/">
+            
+                    
+                    11.Python与Flask的结合应用
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.12.1" data-path="../11.Python与Flask的结合应用/11.1 忘记密码.html">
+            
+                <a href="../11.Python与Flask的结合应用/11.1 忘记密码.html">
+            
+                    
+                    11.1 重置密码流程分析
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12.2" data-path="../11.Python与Flask的结合应用/11.2 first_or_404和可调用对象.html">
+            
+                <a href="../11.Python与Flask的结合应用/11.2 first_or_404和可调用对象.html">
+            
+                    
+                    11.2 first_or_404和可调用对象
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12.3" data-path="../11.Python与Flask的结合应用/11.3 HttpException.html">
+            
+                <a href="../11.Python与Flask的结合应用/11.3 HttpException.html">
+            
+                    
+                    11.3 HttpException
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12.4" data-path="../11.Python与Flask的结合应用/11.4 发送电子邮件.html">
+            
+                <a href="../11.Python与Flask的结合应用/11.4 发送电子邮件.html">
+            
+                    
+                    11.4 重置密码
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12.5" data-path="../11.Python与Flask的结合应用/11.5 鱼漂.html">
+            
+                <a href="../11.Python与Flask的结合应用/11.5 鱼漂.html">
+            
+                    
+                    11.5 发送鱼漂
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12.6" data-path="../11.Python与Flask的结合应用/11.5 交易记录.html">
+            
+                <a href="../11.Python与Flask的结合应用/11.5 交易记录.html">
+            
+                    
+                    11.6 交易记录
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.12.7" data-path="../11.Python与Flask的结合应用/11.7 撤销操作.html">
+            
+                <a href="../11.Python与Flask的结合应用/11.7 撤销操作.html">
+            
+                    
+                    11.7 其他操作
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >4.2 AppContext、RequestContext、Flask与Request之间的关系</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="42-appcontext&#x3001;requestcontext&#x3001;flask&#x4E0E;request&#x4E4B;&#x95F4;&#x7684;&#x5173;&#x7CFB;">4.2 AppContext&#x3001;RequestContext&#x3001;Flask&#x4E0E;Request&#x4E4B;&#x95F4;&#x7684;&#x5173;&#x7CFB;</h1>
+<h2 id="1&#x5B9A;&#x4F4D;appcontext&#x3001;requestcontext">1.&#x5B9A;&#x4F4D;AppContext&#x3001;RequestContext</h2>
+<p>Flask&#x6709;&#x4E24;&#x4E2A;&#x4E0A;&#x4E0B;&#x6587;&#xFF0C;&#x5E94;&#x7528;&#x4E0A;&#x4E0B;&#x6587;-AppContext&#x548C;&#x8BF7;&#x6C42;&#x4E0A;&#x4E0B;&#x6587;-RequestContext&#x3002;&#x4ED6;&#x4EEC;&#x672C;&#x8D28;&#x90FD;&#x662F;&#x5BF9;&#x8C61;&#xFF0C;&#x662F;&#x4E00;&#x79CD;&#x5C01;&#x88C5;&#x3002;&#x5E94;&#x7528;&#x4E0A;&#x4E0B;&#x6587;&#x662F;&#x5BF9;Flask&#x7684;&#x5C01;&#x88C5;&#xFF0C;&#x8BF7;&#x6C42;&#x4E0A;&#x4E0B;&#x6587;&#x662F;&#x5BF9;Request&#x7684;&#x5C01;&#x88C5;</p>
+<p>&#x4E0B;&#x9762;&#x6211;&#x4EEC;&#x6765;&#x901A;&#x8FC7;&#x6E90;&#x7801;&#xFF0C;&#x4E86;&#x89E3;&#x4E00;&#x4E0B;&#x8FD9;&#x4E24;&#x4E2A;&#x4E0A;&#x4E0B;&#x6587;&#x3002;
+Flask&#x6E90;&#x7801;&#x7684;&#x5168;&#x8C8C;&#xFF0C;&#x662F;&#x5728;External Libraries/site-pacages/flask&#x4E0B;<img src="https://upload-images.jianshu.io/upload_images/7220971-a5d3da76a5ee10e1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png">
+Flask&#x662F;&#x4E00;&#x4E2A;&#x975E;&#x5E38;&#x597D;&#x7684;&#x5FAE;&#x6846;&#x67B6;&#xFF0C;&#x91CC;&#x9762;&#x7684;&#x6E90;&#x7801;&#x5E76;&#x4E0D;&#x591A;&#xFF0C;&#x5927;&#x90E8;&#x5206;&#x90FD;&#x662F;&#x6CE8;&#x91CA;&#xFF0C;&#x8FD9;&#x7ED9;&#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x5F88;&#x65B9;&#x4FBF;&#x7684;&#x9605;&#x8BFB;&#x6E90;&#x7801;</p>
+<p>&#x6211;&#x4EEC;&#x8981;&#x770B;&#x7684;&#x4E24;&#x4E2A;&#x4E0A;&#x4E0B;&#x6587;&#x5728;ctx.py&#xFF08;context&#x7684;&#x7F29;&#x5199;&#xFF09;&#x4E2D;&#xFF0C;&#x5176;&#x4E2D;&#x7684;AppContext&#x5C31;&#x662F;&#x5E94;&#x7528;&#x4E0A;&#x4E0B;&#x6587;&#xFF0C;RequestContext&#x5C31;&#x662F;&#x8BF7;&#x6C42;&#x4E0A;&#x4E0B;&#x6587;
+<img src="https://upload-images.jianshu.io/upload_images/7220971-75e04ffc4f79a77d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<p>&#x9605;&#x8BFB;AppContext&#x548C;RequestContext&#x7684;&#x6784;&#x9020;&#x51FD;&#x6570;&#xFF0C;&#x53D1;&#x73B0;&#x4ED6;&#x4EEC;&#x90FD;&#x5C06;&#x6838;&#x5FC3;&#x5BF9;&#x8C61;app&#x4F5C;&#x4E3A;&#x4E86;&#x4ED6;&#x4EEC;&#x7684;&#x4E00;&#x4E2A;&#x5C5E;&#x6027;</p>
+<pre><code>    def __init__(self, app):
+        self.app = app
+        self.url_adapter = app.create_url_adapter(None)
+        self.g = app.app_ctx_globals_class()
+
+        # Like request context, app contexts can be pushed multiple times
+        # but there a basic &quot;refcount&quot; is enough to track them.
+        self._refcnt = 0
+</code></pre><p>&#x5E76;&#x4E14;&#x4ED6;&#x4EEC;&#x90FD;&#x6709;&#x76F8;&#x540C;&#x7684;&#x56DB;&#x4E2A;&#x65B9;&#x6CD5;</p>
+<pre><code>def push(self):
+    ...
+def pop(self, exc=_sentinel):
+    ...
+def __enter__(self):
+    ...
+def __exit__(self, exc_type, exc_value, tb):
+    ...
+</code></pre><h2 id="2&#x4E3A;&#x4EC0;&#x4E48;&#x9700;&#x8981;&#x4E0A;&#x4E0B;&#x6587;">2.&#x4E3A;&#x4EC0;&#x4E48;&#x9700;&#x8981;&#x4E0A;&#x4E0B;&#x6587;</h2>
+<p>&#x4E3A;&#x4EC0;&#x4E48;&#x9700;&#x8981;&#x4E0A;&#x4E0B;&#x6587;&#xFF0C;&#x6211;&#x4EEC;&#x4E4B;&#x95F4;&#x64CD;&#x4F5C;Flask&#x7684;&#x6838;&#x5FC3;&#x5BF9;&#x8C61;app&#x4E0D;&#x53EF;&#x4EE5;&#x5417;&#xFF1F;</p>
+<p>&#x8FD9;&#x662F;&#x4E00;&#x4E2A;&#x8BBE;&#x8BA1;&#x601D;&#x60F3;&#x3002;&#x6709;&#x65F6;&#x5019;&#x5462;&#xFF0C;&#x6211;&#x4EEC;&#x4E0D;&#x5149;&#x9700;&#x8981;&#x8FD9;&#x4E2A;&#x6838;&#x5FC3;&#x5BF9;&#x8C61;app&#xFF0C;&#x8FD8;&#x9700;&#x8981;&#x4ED6;&#x5916;&#x90E8;&#x7684;&#x4E00;&#x4E9B;&#x4E1C;&#x897F;&#xFF0C;&#x8FD9;&#x4E2A;&#x65F6;&#x5019;&#xFF0C;&#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x4ED6;&#x4EEC;&#x7EDF;&#x4E00;&#x7ED3;&#x5408;&#x5C01;&#x88C5;&#x5230;&#x4E00;&#x8D77;&#xFF0C;&#x7EC4;&#x88C5;&#x6210;&#x4E00;&#x4E2A;&#x65B0;&#x7684;&#x4E0A;&#x4E0B;&#x6587;&#x5BF9;&#x8C61;&#xFF0C;&#x5E76;&#x4E14;&#x5728;&#x8FD9;&#x4E2A;&#x5BF9;&#x8C61;&#x4E4B;&#x4E0A;&#xFF0C;&#x53EF;&#x4EE5;&#x63D0;&#x4F9B;&#x4E00;&#x4E9B;&#x65B0;&#x7684;&#x65B9;&#x6CD5;&#xFF0C;&#x5982;&#x6211;&#x4EEC;&#x4E0A;&#x9762;&#x6240;&#x63D0;&#x5230;&#x7684;push&#x3001;pop&#x7B49;</p>
+<h2 id="3&#x5BF9;appcontext&#x3001;requestcontext&#x3001;flask&#x4E0E;request&#x7684;&#x610F;&#x4E49;&#x505A;&#x51FA;&#x4E00;&#x4E2A;&#x89E3;&#x91CA;">3.&#x5BF9;AppContext&#x3001;RequestContext&#x3001;Flask&#x4E0E;Request&#x7684;&#x610F;&#x4E49;&#x505A;&#x51FA;&#x4E00;&#x4E2A;&#x89E3;&#x91CA;</h2>
+<ul>
+<li>Flask&#xFF1A;&#x6838;&#x5FC3;&#x5BF9;&#x8C61;&#xFF0C;&#x6838;&#x5FC3;&#x5BF9;&#x8C61;&#x91CC;&#x627F;&#x8F7D;&#x4E86;&#x5404;&#x79CD;&#x5404;&#x6837;&#x7684;&#x529F;&#x80FD;&#xFF0C;&#x6BD4;&#x5982;&#x4FDD;&#x5B58;&#x914D;&#x7F6E;&#x4FE1;&#x606F;&#xFF0C;&#x518D;&#x6BD4;&#x5982;&#x6CE8;&#x518C;&#x8DEF;&#x7531;&#x8BD5;&#x56FE;&#x51FD;&#x6570;&#x7B49;</li>
+<li>AppContext&#xFF1A;&#x5BF9;Flask&#x7684;&#x5C01;&#x88C5;&#xFF0C;&#x5E76;&#x4E14;&#x589E;&#x52A0;&#x4E86;&#x4E00;&#x4E9B;&#x989D;&#x5916;&#x7684;&#x53C2;&#x6570;</li>
+<li>Request&#xFF1A;&#x4FDD;&#x5B58;&#x4E86;&#x8BF7;&#x6C42;&#x4FE1;&#x606F;&#xFF0C;&#x6BD4;&#x5982;url&#x7684;&#x53C2;&#x6570;&#xFF0C;url&#x7684;&#x5168;&#x8DEF;&#x5F84;&#x7B49;&#x4FE1;&#x606F;</li>
+<li>RequestContext&#xFF1A;&#x5BF9;Request&#x7684;&#x5C01;&#x88C5;</li>
+</ul>
+<p>&#x6211;&#x4EEC;&#x5728;&#x5B9E;&#x9645;&#x7F16;&#x7801;&#x8FC7;&#x7A0B;&#x4E2D;&#xFF0C;&#x53EF;&#x80FD;&#x662F;&#x9700;&#x8981;Flask&#x6216;&#x8005;Request&#x7684;&#x4FE1;&#x606F;&#x7684;&#xFF0C;&#x4F46;&#x662F;&#x8FD9;&#x5E76;&#x4E0D;&#x4EE3;&#x8868;&#x6211;&#x4EEC;&#x5E94;&#x8BE5;&#x76F4;&#x63A5;&#x5BFC;&#x5165;&#x8FD9;&#x4E24;&#x4E2A;&#x5BF9;&#x8C61;&#x83B7;&#x53D6;&#x76F8;&#x5173;&#x4FE1;&#x606F;&#xFF0C;&#x6B63;&#x786E;&#x7684;&#x505A;&#x6CD5;&#x662F;&#x4ECE;AppContext&#xFF0C;RequestContext&#x4E2D;&#x95F4;&#x63A5;&#x7684;&#x83B7;&#x5F97;&#x6211;&#x4EEC;&#x9700;&#x8981;&#x7684;&#x4FE1;&#x606F;</p>
+<p>&#x5373;&#x4F7F;&#x8FD9;&#x6837;&#xFF0C;&#x6211;&#x4EEC;&#x4E5F;&#x6CA1;&#x6709;&#x5FC5;&#x8981;&#x5BFC;&#x5165;Context&#x53BB;&#x4F7F;&#x7528;&#x4E0A;&#x4E0B;&#x6587;&#xFF0C;&#x8FD9;&#x5C31;&#x56DE;&#x5230;&#x4E86;current_app&#x548C;request&#x8FD9;&#x4E9B;LocalProxy&#xFF0C;&#x4ED6;&#x4EEC;&#x63D0;&#x4F9B;&#x4E86;&#x95F4;&#x63A5;&#x64CD;&#x4F5C;&#x4E0A;&#x4E0B;&#x6587;&#x5BF9;&#x8C61;&#x7684;&#x80FD;&#x529B;&#xFF0C;&#x4F7F;&#x7528;&#x4E86;&#x4EE3;&#x7406;&#x6A21;&#x5F0F;</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="4.1 flask中经典错误 working outside application context.html" class="navigation navigation-prev " aria-label="Previous page: 4.1 flask中经典错误 working outside application context">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="4.3 详解flask上下文与出入栈.html" class="navigation navigation-next " aria-label="Next page: 4.3 详解flask上下文与出入栈">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"4.2 AppContext、RequestContext、Flask与Request之间的关系","level":"1.5.2","depth":2,"next":{"title":"4.3 详解flask上下文与出入栈","level":"1.5.3","depth":2,"path":"4.flask核心机制/4.3 详解flask上下文与出入栈.md","ref":"4.flask核心机制/4.3 详解flask上下文与出入栈.md","articles":[]},"previous":{"title":"4.1 flask中经典错误 working outside application context","level":"1.5.1","depth":2,"path":"4.flask核心机制/4.1 flask中经典错误 working outside application context.md","ref":"4.flask核心机制/4.1 flask中经典错误 working outside application context.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["livereload"],"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"4.flask核心机制/4.2 AppContext、RequestContext、Flask与Request之间的关系.md","mtime":"2018-06-15T03:11:05.000Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-11-27T01:29:53.294Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-livereload/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
